@@ -1,0 +1,4 @@
+pyyolo
+matplotlib
+djitellopy
+numpy
