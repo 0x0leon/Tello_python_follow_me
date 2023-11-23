@@ -6,9 +6,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 
-# figure and axis
-fig, ax = plt.subplots()
-
 # drone positions
 x_positions = []
 y_positions = []
@@ -19,7 +16,7 @@ rifX = 960/2
 rifY = 720/2
 
 #PI constant
-Kp_X = 0.1
+Kp_X = 0.4
 Ki_X = 0.0
 Kp_Y = 0.2
 Ki_Y = 0.0
@@ -116,10 +113,6 @@ while True:
 			cv2.rectangle(frame, (startX, startY), (endX, endY),
 				colors[idx], 2)
 			
-			# print("startX ", startX)
-			# print("startY ",startY)
-			# print("endX ",endX)
-			# print("endY ",endY)
 
 			#draw the center of the person detected
 			center_x = (startX + endX) / 2
@@ -152,34 +145,16 @@ while True:
 			previous_error_Y = error_Y				# update previous error Variable
 			
 
+			speed = 50
 
-
-			state = drone.get_current_state()
-			print(state)
-			x = state['x']
-			y = state['y']
-			z = state['z']
-			# print(f"X: {x}, Y: {y}, Z: {z}")
-			
-			# if x != -100 and y != -100 and z != -100:
-            # 	# Print the coordinates
-			# 	print(f"X: {x}, Y: {y}, Z: {z}")
-
-			# acceleration
-
-			# x_ac = drone.get_acceleration_x
-			# y_ac = drone.get_acceleration_y
-			# z_ac = drone.get_acceleration_z
-
-			speed = 40
-
-			if endX - startX < rifX - 100:
+			if endX - startX < rifX - 200:
 				# need to add first and second parameter too
-				drone.send_rc_control(0,20,round(uY),round(uX))
+				drone.send_rc_control(0,speed,round(uY),round(uX))
 				#break when a person is recognized
-
-			elif endX - startX > rifX - 100:
-				drone.send_rc_control(0,-20,round(uY),round(uX))
+			elif endX - startX < rifX - 100: 
+				drone.send_rc_control(0,round(speed / 2),round(uY),round(uX))
+			elif endX - startX >= rifX:
+				drone.send_rc_control(0,-speed,round(uY),round(uX))
 			else:
 				drone.send_rc_control(0,0,round(uY),round(uX))
 			break	
@@ -231,6 +206,7 @@ while True:
 	# end flight
 	if cv2.waitKey(1) & 0xFF == ord("q"):
 		break
+	
 
 
 
@@ -239,7 +215,7 @@ while True:
 
 # Show the plot
 #plt.show()
-
+drone.land()
 drone.streamoff()
 cv2.destroyAllWindows()
 drone.land()
